@@ -27,8 +27,10 @@ h1, h2, h3 {
 }
 
 .bar {
-    
+  fill:green;
+  opacity:.4;
 }
+
 
 .primary-bar-color {
     fill: #468966;
@@ -37,3 +39,4 @@ h1, h2, h3 {
 .secondary-bar-color {
     fill: #B8491E
 }
+

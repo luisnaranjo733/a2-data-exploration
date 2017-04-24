@@ -128,41 +128,57 @@ $(function () {
             // Set axes
             setAxes();
 
-            // // Select all rects and bind data
-            // let bars = g.selectAll('rect').data(data);
+            let flattened_data = aggregated_data.map((game, i) => {
+                let firstPlay = game.value[0];
+                let game_observation = {
+                    'id': i,
+                    'opponent': firstPlay.DefenseTeam,
+                    'formations': {}
+                }
+                game.value.forEach(play => {
+                    if (game_observation.formations[play.Formation]) {
+                        game_observation.formations[play.Formation] += 1
+                    } else {
+                        game_observation.formations[play.Formation] = 1;
+                    }
+                })
+                return game_observation;
+            })
 
-            // // Use the .enter() method to get your entering elements, and assign initial positions
-            // bars.enter().append('rect')
-            //     .attr('x', function(d) {
-            //         return xScale(d.state);
-            //     })
-            //     .attr('y', function(d) {
-            //         return yScale(d.percent);
-            //     })
-            //     .attr('height', function(d) {
-            //         return height - yScale(d.percent);
-            //     })
-            //     .attr('width', xScale.bandwidth())
-            //     .attr('class', 'bar')
-            //     .attr('title', function(d) {
-            //         return d.state_name;
-            //     });
+            console.log(flattened_data);
 
-            // // Use the .exit() and .remove() methods to remove elements that are no longer in the data
-            // bars.exit().remove();
+            // Select all rects and bind data
+            let bars = g.selectAll('rect').data(flattened_data);
 
-            // // Transition properties of the update selection
-            // bars.transition()
-            //     .duration(1500)
-            //     .delay(function(d, i) {
-            //         return i * 50;
-            //     })
-            //     .attr('height', function(d) {
-            //         return height - yScale(d.percent);
-            //     })
-            //     .attr('y', function(d) {
-            //         return yScale(d.percent);
-            //     });
+            // Use the .enter() method to get your entering elements, and assign initial positions
+            bars.enter().append('rect')
+                .attr('x', game => xScale(game.opponent))
+                .attr('y', game => {
+                    return yScale(game.formations['SHOTGUN']);
+                })
+                .attr('height', game => {
+                    return drawHeight - yScale(game.formations['SHOTGUN']);
+                })
+                .attr('width', xScale.bandwidth())
+                .attr('class', 'bar')
+                .attr('title', game => game.opponent)
+       
+
+            // Use the .exit() and .remove() methods to remove elements that are no longer in the data
+            bars.exit().remove();
+
+            // Transition properties of the update selection
+            bars.transition()
+                .duration(1500)
+                .delay(function(d, i) {
+                    return i * 50;
+                })
+                .attr('height', function(d) {
+                    return height - yScale(d.formations['SHOTGUN']);
+                })
+                .attr('y', function(d) {
+                    return yScale(d.formations['SHOTGUN']);
+                });
 
         };
 
@@ -179,6 +195,11 @@ $(function () {
 
             filterData();
             draw(currentData, currentAggregatedData);
+        });
+
+        $("rect").tooltip({
+            'container': 'body',
+            'placement': 'top'
         });
 
     });
