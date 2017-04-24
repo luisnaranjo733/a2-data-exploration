@@ -1,7 +1,7 @@
 $(function () {
     d3.csv('data/pbp-2016-nfc-west.csv', function (error, allData) {
 
-        let xScale, yScale, currentData;
+        let xScale, yScale, currentData, currentAggregatedData;
 
         let teamValue = $("input[name='nfc-team']:checked").val();
         let playTypeValue = $("input[name='play-type']:checked").val();
@@ -46,19 +46,27 @@ $(function () {
             .attr('class', 'title');
 
         let yAxisText = svg.append('text')
-            .attr('transofmr', `translate(${margin.left - 40}, ${margin.top + drawHeight / 2}) rotate(-90)`)
+            .attr('transform', `translate(${margin.left - 40}, ${margin.top + drawHeight / 2 + 200}) rotate(-90)`)
             .attr('class', 'title');
 
-        let setScales = (data) => {
-            let games = data.map(obj => obj);
+        let setScales = (data, aggregated_data) => {
+
+            let games = aggregated_data.map(game => game.value[0].DefenseTeam);
 
             // Define an ordinal xScale using rangeBands
             xScale = d3.scaleBand()
                 .range([0, drawWidth], .2)
                 .domain(games);
 
-            var yMin = d3.min(data, obj => +obj.measure);
-            var yMax = d3.max(data, obj => +obj.measure);
+            var yMax = d3.max(aggregated_data, game => {
+                let count_formation = 0;
+                game.value.forEach(play => {
+                    if (play.Formation == 'SHOTGUN') {
+                        count_formation += 1;
+                    }
+                });
+                return count_formation;
+            });
 
             yScale = d3.scaleLinear()
                 .range([drawHeight, 0])
@@ -82,7 +90,6 @@ $(function () {
         };
 
         let filterData = () => {
-
             currentData = allData.filter(play => {
                 let correct_team = play.OffenseTeam == teamValue;
 
@@ -98,15 +105,12 @@ $(function () {
                 return correct_team && correct_play_type && correct_outcome;
             });
 
-
-            let aggregated_data = d3.nest()
+            currentAggregatedData = d3.nest()
                 .key(obj => obj.GameId)
                 .rollup(objects => {
                     return objects;
                 })
                 .entries(currentData);
-
-            console.log(aggregated_data);
         };
 
         let logMeasures = () => {
@@ -116,18 +120,54 @@ $(function () {
         };
 
 
-        let draw = (data) => {
-            logMeasures();
-            // console.log(data);
+        let draw = (data, aggregated_data) => {
+
             // Set scales
-            setScales(data);
+            setScales(data, aggregated_data);
 
             // Set axes
             setAxes();
+
+            // // Select all rects and bind data
+            // let bars = g.selectAll('rect').data(data);
+
+            // // Use the .enter() method to get your entering elements, and assign initial positions
+            // bars.enter().append('rect')
+            //     .attr('x', function(d) {
+            //         return xScale(d.state);
+            //     })
+            //     .attr('y', function(d) {
+            //         return yScale(d.percent);
+            //     })
+            //     .attr('height', function(d) {
+            //         return height - yScale(d.percent);
+            //     })
+            //     .attr('width', xScale.bandwidth())
+            //     .attr('class', 'bar')
+            //     .attr('title', function(d) {
+            //         return d.state_name;
+            //     });
+
+            // // Use the .exit() and .remove() methods to remove elements that are no longer in the data
+            // bars.exit().remove();
+
+            // // Transition properties of the update selection
+            // bars.transition()
+            //     .duration(1500)
+            //     .delay(function(d, i) {
+            //         return i * 50;
+            //     })
+            //     .attr('height', function(d) {
+            //         return height - yScale(d.percent);
+            //     })
+            //     .attr('y', function(d) {
+            //         return yScale(d.percent);
+            //     });
+
         };
 
         filterData();
-        draw(currentData);
+        draw(currentData, currentAggregatedData);
 
 
         
@@ -138,7 +178,7 @@ $(function () {
             touchdownPlaysOnly = $('#touchdowns-toggle').prop('checked');
 
             filterData();
-            // draw(currentData);
+            draw(currentData, currentAggregatedData);
         });
 
     });
