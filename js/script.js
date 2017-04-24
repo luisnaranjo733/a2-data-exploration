@@ -131,7 +131,7 @@ $(function () {
             let flattened_data = aggregated_data.map((game, i) => {
                 let firstPlay = game.value[0];
                 let game_observation = {
-                    'id': i,
+                    'id': i + 1,
                     'opponent': firstPlay.DefenseTeam,
                     'formations': {}
                 }
@@ -161,7 +161,8 @@ $(function () {
                 })
                 .attr('width', xScale.bandwidth())
                 .attr('class', 'bar')
-                .attr('title', game => game.opponent)
+                .attr('title', game => `Game ${game.id} vs ${game.opponent}`)
+
        
 
             // Use the .exit() and .remove() methods to remove elements that are no longer in the data
@@ -174,7 +175,7 @@ $(function () {
                     return i * 50;
                 })
                 .attr('height', function(d) {
-                    return height - yScale(d.formations['SHOTGUN']);
+                    return drawHeight - yScale(d.formations['SHOTGUN']);
                 })
                 .attr('y', function(d) {
                     return yScale(d.formations['SHOTGUN']);
