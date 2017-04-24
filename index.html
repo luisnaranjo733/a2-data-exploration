@@ -41,27 +41,20 @@
         <h2>Data visualization title</h2>
         <p>Question: How did the NFC West teams use offensive formations in 2016?</p>
 
-		<div class="btn-group" data-toggle="buttons">
-			<label class="radio-inline">
-				<input type="radio" name="nfc-team" id="inlineRadio1" value="seahawks" checked> Seahawks
-			</label>
-			<label class="radio-inline">
-				<input type="radio" name="nfc-team" id="inlineRadio2" value="cardinals"> Cardinals
-			</label>
-			<label class="radio-inline">
-				<input type="radio" name="nfc-team" id="inlineRadio3" value="rams"> Rams
-			</label>
-			<label class="radio-inline">
-				<input type="radio" name="nfc-team" id="inlineRadio4" value="49ers"> 49ers
-			</label>
-		</div>
-
-
-		<br />
-
-		<input type="checkbox" id="touchdowns-toggle" data-toggle="toggle" data-on="TD plays only" data-off="All plays">
-		<br />
-
+       <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary">
+		    	<input value = "cardinals" type="radio" name="nfc-team" id="cardinals">Cardinals
+		  	</label>
+            <label class="btn btn-primary">
+		    	<input value = "rams" type="radio" name="nfc-team" id="rams">Rams
+		  	</label>
+            <label class="btn btn-primary">
+		    	<input value = "49ers" type="radio" name="nfc-team" id="49ers">49ers
+		  	</label>
+            <label class="btn btn-primary active">
+		    	<input value = "seahawks" type="radio" name="nfc-team" id="seahawks" checked>Seahawks
+		  	</label>
+        </div>
 
         <div class="btn-group" data-toggle="buttons">
             <label class="btn btn-primary">
@@ -75,10 +68,8 @@
 		  	</label>
         </div>
 
-		<br />
-
-
         <div id="viz"></div>
+		<input type="checkbox" id="touchdowns-toggle" data-toggle="toggle" data-on="TD plays only" data-off="All plays">
     </div>
 
 </body>
