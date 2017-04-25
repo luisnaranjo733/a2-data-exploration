@@ -5,6 +5,7 @@ $(function () {
 
         let teamValue = $("input[name='nfc-team']:checked").val();
         let playTypeValue = $("input[name='play-type']:checked").val();
+        let playFormationValue = $("input[name='play-formation']:checked").val();
         let touchdownPlaysOnly = $('#touchdowns-toggle').prop('checked');
 
         let margin = {
@@ -46,7 +47,7 @@ $(function () {
             .attr('class', 'title');
 
         let yAxisText = svg.append('text')
-            .attr('transform', `translate(${margin.left - 40}, ${margin.top + drawHeight / 2 + 200}) rotate(-90)`)
+            .attr('transform', `translate(${margin.left - 40}, ${margin.top + drawHeight / 2 + 100}) rotate(-90)`)
             .attr('class', 'title');
 
         let setScales = (data, aggregated_data) => {
@@ -54,7 +55,6 @@ $(function () {
             let games = aggregated_data.map(game => game.value[0].DefenseTeam);
             // games = aggregated_data.map((game, i) => `${i+1}: ${game.value[0].DefenseTeam}`);
 
-            // Define an ordinal xScale using rangeBands
             xScale = d3.scaleBand()
                 .range([0, drawWidth], .2)
                 .domain(games);
@@ -62,7 +62,7 @@ $(function () {
             var yMax = d3.max(aggregated_data, game => {
                 let count_formation = 0;
                 game.value.forEach(play => {
-                    if (play.Formation == 'SHOTGUN') {
+                    if (play.Formation == playFormationValue) {
                         count_formation += 1;
                     }
                 });
@@ -87,7 +87,7 @@ $(function () {
             yAxisLabel.transition().duration(1500).call(yAxis);
 
             xAxisText.text('2016 Season');
-            yAxisText.text(`Frequency of the shotgun formation for the ${teamValue} (${playTypeValue}, ${touchdownPlaysOnly})`);
+            yAxisText.text(`Plays ran from ${playFormationValue}for ${teamValue}`);
         };
 
         let filterData = () => {
@@ -102,8 +102,10 @@ $(function () {
                 }
 
                 let correct_outcome = play.IsTouchdown == touchdownPlaysOnly;
-                
-                return correct_team && correct_play_type && correct_outcome;
+
+                let correct_formation = play.Formation == playFormationValue;
+
+                return correct_team && correct_play_type && correct_outcome && correct_formation;
             });
 
             currentAggregatedData = d3.nest()
@@ -153,7 +155,7 @@ $(function () {
             bars.enter().append('rect')
                 .attr('x', game => xScale(game.opponent))
                 .attr('y', game => {
-                    let shotgun_plays = game.formations['SHOTGUN'];
+                    let shotgun_plays = game.formations[playFormationValue];
                     if (!shotgun_plays) {
                         shotgun_plays = 0;
                     }
@@ -161,12 +163,12 @@ $(function () {
                     if (!y && y !== 0) {
                         console.log('y tho');
                         console.log(game);
-                        console.log(yScale(game.formations['SHOTGUN']))
+                        console.log(yScale(game.formations[playFormationValue]))
                     }
                     return y;
                 })
                 .attr('height', game => {
-                    let shotgun_plays = game.formations['SHOTGUN'];
+                    let shotgun_plays = game.formations[playFormationValue];
                     if (!shotgun_plays) {
                         shotgun_plays = 0;
                     }
@@ -190,14 +192,14 @@ $(function () {
                 .duration(1500)
                 .delay((d, i) => i * 50)
                 .attr('height', (game) => {
-                    let shotgun = game.formations['SHOTGUN'];
+                    let shotgun = game.formations[playFormationValue];
                     if (!shotgun) {
                         shotgun = 0;
                     }
                     return drawHeight - yScale(shotgun);
                 })
                 .attr('y', (game) => {
-                    let shotgun = game.formations['SHOTGUN'];
+                    let shotgun = game.formations[playFormationValue];
                     if (!shotgun) {
                             shotgun = 0;
                     }
@@ -213,16 +215,52 @@ $(function () {
         filterData();
         draw(currentData, currentAggregatedData);
 
-
-        
+        /*  How many plays did the Seahawks throw from the shotgun?
+            How many touchdowns did the Seahawks throw from the shotgun?
+            How many plays/touchdowns did the TEAM throw/pass from the FORMATION?
+        */
 
         $('input').on('change', (event) => {
             teamValue = $("input[name='nfc-team']:checked").val();
             playTypeValue = $("input[name='play-type']:checked").val();
+            playFormationValue = $("input[name='play-formation']:checked").val();
             touchdownPlaysOnly = $('#touchdowns-toggle').prop('checked');
 
             filterData();
             draw(currentData, currentAggregatedData);
+
+            let outcome = null;
+            if (touchdownPlaysOnly) {
+                outcome = 'touchdowns';
+            } else {
+                outcome = 'plays';
+            }
+
+            let method = null;
+            if (playTypeValue == 'PASS') {
+                method = 'throw';
+            } else if(playTypeValue == 'RUSH') {
+                method = 'run';
+            } else {
+                method = 'execute';
+            }
+
+            let team = null;
+            if (teamValue == 'SEA') {
+                team = 'Seahawks';
+            } else if (teamValue == 'LA') {
+                team = 'Rams';
+            } else if (teamValue == 'SF') {
+                team = '49ers';
+            } else if (teamValue == 'ARI'){
+                team = 'Cardinals';
+            }
+
+            playFormationValue = playFormationValue.toLowerCase();
+            let question = `How many ${outcome} did the ${team} ${method} from the ${playFormationValue} formation in 2016?`;
+            $('#question').text(question);
+           
+
         });
 
         $("rect").tooltip({

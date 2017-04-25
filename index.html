@@ -38,8 +38,9 @@
     </div>-->
 
     <div class="container">
-        <h2>Data visualization title</h2>
-        <p>Question: How did the NFC West teams use the shotgun formation in 2016?</p>
+        <h2>Offensive formations of the NFC West in 2016</h2>
+        <label>Question:      </label><p id="question"> `How many plays did the Seahawks execute from the Shotgun in 2016?`;</p>
+        <br /> <br />
 
        <div class="btn-group" data-toggle="buttons">
             <label class="btn btn-primary">
@@ -65,6 +66,18 @@
 		  	</label>
             <label class="btn btn-primary active">
 		    	<input value="BOTH" type="radio" name="play-type" id="both" checked>Both
+		  	</label>
+        </div>
+
+        <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary">
+		    	<input value="UNDER CENTER" type="radio" name="play-formation" id="passing">Under Center
+		  	</label>
+            <label class="btn btn-primary">
+		    	<input value="NO HUDDLE SHOTGUN" type="radio" name="play-formation" id="rushing">No Huddle Shotgun
+		  	</label>
+            <label class="btn btn-primary active">
+		    	<input value="SHOTGUN" type="radio" name="play-formation" id="both" checked>Shotgun
 		  	</label>
         </div>
 

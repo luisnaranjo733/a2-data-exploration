@@ -40,3 +40,8 @@ h1, h2, h3 {
     fill: #B8491E
 }
 
+
+#question {
+    display: inline;
+    margin-left: 1em;
+}
