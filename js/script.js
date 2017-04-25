@@ -146,8 +146,6 @@ $(function () {
                 return game_observation;
             })
 
-            console.log(flattened_data);
-
             // Select all rects and bind data
             let bars = g.selectAll('rect').data(flattened_data);
 
@@ -155,10 +153,28 @@ $(function () {
             bars.enter().append('rect')
                 .attr('x', game => xScale(game.opponent))
                 .attr('y', game => {
-                    return yScale(game.formations['SHOTGUN']);
+                    let shotgun_plays = game.formations['SHOTGUN'];
+                    if (!shotgun_plays) {
+                        shotgun_plays = 0;
+                    }
+                    let y = yScale(shotgun_plays);
+                    if (!y && y !== 0) {
+                        console.log('y tho');
+                        console.log(game);
+                        console.log(yScale(game.formations['SHOTGUN']))
+                    }
+                    return y;
                 })
                 .attr('height', game => {
-                    return drawHeight - yScale(game.formations['SHOTGUN']);
+                    let shotgun_plays = game.formations['SHOTGUN'];
+                    if (!shotgun_plays) {
+                        shotgun_plays = 0;
+                    }
+                    let height = drawHeight - yScale(shotgun_plays);
+                    if (!height && height !== 0) {
+                        console.log('height tho');
+                    }
+                    return height;
                 })
                 .attr('width', xScale.bandwidth())
                 .attr('class', 'bar')
@@ -184,6 +200,11 @@ $(function () {
                     let shotgun = game.formations['SHOTGUN'];
                     if (!shotgun) {
                             shotgun = 0;
+                    }
+                    if (!yScale(shotgun) && yScale(shotgun) !== 0) {
+                        console.log("AHAH!");
+                        console.log(shotgun);
+                        console.log(yScale(shotgun));
                     }
                     return yScale(shotgun);
                 });
