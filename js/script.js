@@ -1,13 +1,15 @@
 $(function () {
     d3.csv('data/pbp-2016-nfc-west.csv', function (error, allData) {
-
+        // set global variables for reusable functions to use
         let xScale, yScale, currentData, currentAggregatedData;
 
+        // fetch default values for controls from DOM
         let teamValue = $("input[name='nfc-team']:checked").val();
         let playTypeValue = $("input[name='play-type']:checked").val();
         let playFormationValue = $("input[name='play-formation']:checked").val();
         let touchdownPlaysOnly = $('#touchdowns-toggle').prop('checked');
 
+        // define inner svg size
         let margin = {
             left: 70,
             bottom: 100,
@@ -15,13 +17,17 @@ $(function () {
             right: 50,
         };
 
+        // define outer svg size
         let width = 1000;
         let height = 600;
 
 
+        // compute inner svg size based on margin declaration
         let drawWidth = width - margin.left - margin.right;
         let drawHeight = height - margin.top - margin.bottom;
 
+
+        // Initialize static elements (svg, g, labels, text)
 
         let svg = d3.select('#viz')
             .append('svg')
@@ -50,6 +56,11 @@ $(function () {
             .attr('transform', `translate(${margin.left - 40}, ${margin.top + drawHeight / 2 + 100}) rotate(-90)`)
             .attr('class', 'title');
 
+        /*
+            The setScales function sets the global x and y scale variables 
+            based on the data it is passed in. It computes the appropriate
+            doman and range for the data it is given.
+        */
         let setScales = (data, aggregated_data) => {
 
             let games = aggregated_data.map(game => game.value[0].DefenseTeam);
@@ -61,7 +72,7 @@ $(function () {
 
             var yMax = d3.max(aggregated_data, game => {
                 let count_formation = 0;
-                game.value.forEach(play => {
+                game.value.forEach(play => { // need to compute the sum of all the formations used for the nested data given
                     if (play.Formation == playFormationValue) {
                         count_formation += 1;
                     }
@@ -74,6 +85,10 @@ $(function () {
                 .domain([0, yMax]);
         };
 
+        /*
+            The setAxes function takes the scales set by the setScales function and renders them.
+            It also sets the text for the axis labels/text.
+        */
         let setAxes = () => {
             var xAxis = d3.axisBottom()
                 .scale(xScale);
@@ -87,9 +102,13 @@ $(function () {
             yAxisLabel.transition().duration(1500).call(yAxis);
 
             xAxisText.text('2016 Season');
-            yAxisText.text(`Plays ran from ${playFormationValue}for ${teamValue}`);
+            yAxisText.text(`${playTypeValue} plays from ${playFormationValue} for ${teamValue}`);
         };
 
+        /*
+            The filterData function filters the data set based on the html input controls
+            that the user has manipulated.
+        */
         let filterData = () => {
             currentData = allData.filter(play => {
                 let correct_team = play.OffenseTeam == teamValue;
@@ -108,6 +127,7 @@ $(function () {
                 return correct_team && correct_play_type && correct_outcome && correct_formation;
             });
 
+            // take the play by play data and nest it by game and store it in a global variable.
             currentAggregatedData = d3.nest()
                 .key(obj => obj.GameId)
                 .rollup(objects => {
@@ -116,13 +136,12 @@ $(function () {
                 .entries(currentData);
         };
 
-        let logMeasures = () => {
-            console.log(`Team: ${teamValue}`);
-            console.log(`Play type: ${playTypeValue}`)
-            console.log(`Touchdown plays only?: ${touchdownPlaysOnly}`);
-        };
+        /*
+            The draw function takes the provided data and renders it.
 
-
+            It leverages the setScales and setAxes function so that it can
+            focus on the data join for the redraw.
+        */
         let draw = (data, aggregated_data) => {
 
             // Set scales
@@ -131,6 +150,8 @@ $(function () {
             // Set axes
             setAxes();
 
+            // The nested data needs to be flattened again so that it is easier
+            // to do a join on it.
             let flattened_data = aggregated_data.map((game, i) => {
                 let firstPlay = game.value[0];
                 let game_observation = {
@@ -148,35 +169,25 @@ $(function () {
                 return game_observation;
             })
 
-            // Select all rects and bind data
+
             let bars = g.selectAll('rect').data(flattened_data);
 
-            // Use the .enter() method to get your entering elements, and assign initial positions
+            // append entering datum
             bars.enter().append('rect')
                 .attr('x', game => xScale(game.opponent))
                 .attr('y', game => {
-                    let shotgun_plays = game.formations[playFormationValue];
-                    if (!shotgun_plays) {
-                        shotgun_plays = 0;
+                    let n_formation_plays = game.formations[playFormationValue];
+                    if (!n_formation_plays) {
+                        n_formation_plays = 0;
                     }
-                    let y = yScale(shotgun_plays);
-                    if (!y && y !== 0) {
-                        console.log('y tho');
-                        console.log(game);
-                        console.log(yScale(game.formations[playFormationValue]))
-                    }
-                    return y;
+                    return yScale(n_formation_plays);
                 })
                 .attr('height', game => {
-                    let shotgun_plays = game.formations[playFormationValue];
-                    if (!shotgun_plays) {
-                        shotgun_plays = 0;
+                    let n_formation_plays = game.formations[playFormationValue];
+                    if (!n_formation_plays) {
+                        n_formation_plays = 0;
                     }
-                    let height = drawHeight - yScale(shotgun_plays);
-                    if (!height && height !== 0) {
-                        console.log('height tho');
-                    }
-                    return height;
+                    return drawHeight - yScale(n_formation_plays);
                 })
                 .attr('width', xScale.bandwidth())
                 .attr('class', 'bar')
@@ -192,33 +203,23 @@ $(function () {
                 .duration(1500)
                 .delay((d, i) => i * 50)
                 .attr('height', (game) => {
-                    let shotgun = game.formations[playFormationValue];
-                    if (!shotgun) {
-                        shotgun = 0;
+                    let n_formation_plays = game.formations[playFormationValue];
+                    if (!n_formation_plays) {
+                        n_formation_plays = 0;
                     }
-                    return drawHeight - yScale(shotgun);
+                    return drawHeight - yScale(n_formation_plays);
                 })
                 .attr('y', (game) => {
-                    let shotgun = game.formations[playFormationValue];
-                    if (!shotgun) {
-                            shotgun = 0;
+                     let n_formation_plays = game.formations[playFormationValue];
+                    if (!n_formation_plays) {
+                        n_formation_plays = 0;
                     }
-                    if (!yScale(shotgun) && yScale(shotgun) !== 0) {
-                        console.log("AHAH!");
-                        console.log(shotgun);
-                        console.log(yScale(shotgun));
-                    }
-                    return yScale(shotgun);
+                    return yScale(n_formation_plays);
                 });
         };
 
         filterData();
         draw(currentData, currentAggregatedData);
-
-        /*  How many plays did the Seahawks throw from the shotgun?
-            How many touchdowns did the Seahawks throw from the shotgun?
-            How many plays/touchdowns did the TEAM throw/pass from the FORMATION?
-        */
 
         $('input').on('change', (event) => {
             teamValue = $("input[name='nfc-team']:checked").val();
@@ -228,6 +229,8 @@ $(function () {
 
             filterData();
             draw(currentData, currentAggregatedData);
+
+            // Compute new question text based on the user's html input control
 
             let outcome = null;
             if (touchdownPlaysOnly) {
