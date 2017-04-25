@@ -48,3 +48,7 @@ h1, h2, h3 {
 #graphic {
     margin-bottom: 2em;
 }
+
+#controls {
+    padding-left: 1em;
+}

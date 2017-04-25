@@ -7,11 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>A2 - Luis</title>
 
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
-	<link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main.css">
 
     <!--D3 CDN-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.7.4/d3.js"></script>
@@ -19,11 +20,12 @@
     <!-- Load jQuery library -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
 
 
-	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
     <script src="js/script.js"></script>
 </head>
@@ -32,10 +34,11 @@
 
     <div class="container" id="graphic">
         <h2>Offensive formations of the NFC West in 2016</h2>
-        <label>Question:      </label><p id="question">How many plays did the Seahawks execute from the Shotgun in 2016?</p>
+        <label>Question:      </label>
+        <p id="question">How many plays did the Seahawks execute from the Shotgun in 2016?</p>
         <br /> <br />
 
-       <div class="btn-group" data-toggle="buttons">
+        <div class="btn-group" data-toggle="buttons">
             <label class="btn btn-primary">
 		    	<input value="ARI" type="radio" name="nfc-team" id="cardinals">Cardinals
 		  	</label>
@@ -75,7 +78,7 @@
         </div>
 
         <div id="viz"></div>
-		<input type="checkbox" id="touchdowns-toggle" data-toggle="toggle" data-on="TD plays only" data-off="All plays">
+        <input type="checkbox" id="touchdowns-toggle" data-toggle="toggle" data-on="TD plays only" data-off="All plays">
     </div>
 
 
@@ -87,7 +90,72 @@
     </div>
 
     <div class="container">
-        <p>Defense</p>
+        <h2>Visual encodings</h2>
+        <p>
+            This NFL visualization explores the NFC West’s use of various offensive formations in the 2016 season. It uses two primary
+            visual encodings. The first one is linear. The games are sorted by date, starting from week 1 and ending with
+            week 16. This gives the viewer a sense of time. This is important because a team’s formation tendencies might
+            gradually change over the course of the season, which may be reflected in the visualization. The second visual
+            encoding is the color of the bars. It changes to the primary jersey color of the selected team in order to help
+            the audience quickly recognize the change in data set.
+        </p>
+
+        <h2>Visual Layout</h2>
+        <p>
+            I used a bar chart for my visual layout. I think that the bar chart is an optional choice for expressing the data effectively
+            because my data will always have less than 16 data points at once (because there are only 16 games in a regular
+            season). If I had many more data points per team, it would not be feasible to use a bar chart because the labels
+            would get really tiny and hard to heard. It would also be hard to compare value across bars. Luckily, the shape
+            of my data complements a bar chart very well.
+        </p>
+
+
+        <h2>Controls</h2>
+        <div id="controls">
+
+            <h3>Switch between teams</h3>
+
+            <p>
+                The first allows the viewer to switch between NFL teams in the NFC West. This is important because the fundamental question
+                the visualization is exploring is how the NFC West used formations in 2016. If the viewer only saw an aggregate
+                chart of all the formations of the NFC West teams at once, the viewer likely wouldn’t learn anything meaningful.
+                This is also why the “all teams” button was not included.
+            </p>
+
+            <h3>Play Type</h3>
+            <p>
+                The second control allows the viewer to toggle between rush, pass, and both types of plays. This is important because it
+                allows the viewer to compare the data for different kinds of plays so that they can find a pattern if it
+                is there. I added a "both" option for this control because I felt that it was important to have so that the
+                viewer had a way of deducing really strong patterns. For example, with this feature I found that the 49ers
+                like to play out of the shotgun quite often. I can quickly infer this by looking at the "both" option, and
+                I can verify it by checking the pass and run options and seeing that they are both similar in usage (heavy).
+
+            </p>
+
+            <h3>Play Formation</h3>
+            <p>
+                The visualization lets the viewer toggle between the 3 available play formations. This is really important because the core
+                question that the visualization is exploring is how each team uses different formations. Allowing the user
+                to toggle different formations allows them to ask different questions. Each play formation almost represents
+                an entirely different domain of data. You could almost do this visualization with just one formation, but
+                I think it is really powerful being able to make it so that the viewer can pick between different formations.
+                One example of a cool thing you can get from trying different formations, is that you can see how the Seahawks
+                changed the way they run their offense through the season. They started out playing a lot out of the shotgun,
+                but by the end of the season they played a lot more under center than anything.
+            </p>
+
+            <h3>Touchdown plays</h3>
+            <p>
+                The visualization allows the viewer to toggle between touchdown plays and non-touchdown plays. This control is not central
+                to answering the question this visualization is exploring, but it does answer a bit of a side question that
+                offshoots from the central question. This question that this toggle helps answer is "what formations resulted
+                in the most touchdowns?".
+            </p>
+
+
+        </div>
+
     </div>
 
 </body>
