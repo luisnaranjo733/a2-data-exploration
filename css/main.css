@@ -27,8 +27,7 @@ h1, h2, h3 {
 }
 
 .bar {
-  fill:green;
-  opacity:.4;
+  opacity:.5;
 }
 
 
@@ -44,4 +43,8 @@ h1, h2, h3 {
 #question {
     display: inline;
     margin-left: 1em;
+}
+
+#graphic {
+    margin-bottom: 2em;
 }

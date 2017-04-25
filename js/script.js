@@ -191,6 +191,7 @@ $(function () {
                 })
                 .attr('width', xScale.bandwidth())
                 .attr('class', 'bar')
+                .attr('fill', 'blue')
                 .attr('title', game => `Game ${game.id} vs ${game.opponent}`)
 
        
@@ -215,6 +216,13 @@ $(function () {
                         n_formation_plays = 0;
                     }
                     return yScale(n_formation_plays);
+                })
+                .attr('fill', () => {
+                    if (teamValue == 'SEA' || teamValue == 'LA') {
+                        return 'blue';
+                    } else {
+                        return 'red';
+                    }
                 });
         };
 
