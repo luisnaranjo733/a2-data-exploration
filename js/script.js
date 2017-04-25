@@ -52,6 +52,7 @@ $(function () {
         let setScales = (data, aggregated_data) => {
 
             let games = aggregated_data.map(game => game.value[0].DefenseTeam);
+            // games = aggregated_data.map((game, i) => `${i+1}: ${game.value[0].DefenseTeam}`);
 
             // Define an ordinal xScale using rangeBands
             xScale = d3.scaleBand()
@@ -171,16 +172,21 @@ $(function () {
             // Transition properties of the update selection
             bars.transition()
                 .duration(1500)
-                .delay(function(d, i) {
-                    return i * 50;
+                .delay((d, i) => i * 50)
+                .attr('height', (game) => {
+                    let shotgun = game.formations['SHOTGUN'];
+                    if (!shotgun) {
+                        shotgun = 0;
+                    }
+                    return drawHeight - yScale(shotgun);
                 })
-                .attr('height', function(d) {
-                    return drawHeight - yScale(d.formations['SHOTGUN']);
-                })
-                .attr('y', function(d) {
-                    return yScale(d.formations['SHOTGUN']);
+                .attr('y', (game) => {
+                    let shotgun = game.formations['SHOTGUN'];
+                    if (!shotgun) {
+                            shotgun = 0;
+                    }
+                    return yScale(shotgun);
                 });
-
         };
 
         filterData();
